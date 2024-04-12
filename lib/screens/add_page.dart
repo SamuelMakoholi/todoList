@@ -10,6 +10,10 @@ class AddTodoPage extends StatefulWidget {
 }
 
 class _AddTodoPageState extends State<AddTodoPage> {
+
+  TextEditingController titleController = TextEditingController();
+  TextEditingController descriptionController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,23 +24,36 @@ class _AddTodoPageState extends State<AddTodoPage> {
       body:  ListView(
         padding: const EdgeInsets.all(20),
         children: [
-          TextField(
+        TextField(
+          controller: titleController,
             decoration: InputDecoration(hintText: 'Title'),
           ),
           
-          SizedBox(height: 20.0,),
+         const SizedBox(height: 20.0,),
 
-          TextField(
+         TextField(
+          controller: descriptionController,
             decoration: InputDecoration(hintText: 'Description'),
             keyboardType: TextInputType.multiline,
             minLines: 5,
             maxLines: 8,
           ),
 
-          SizedBox(height: 20.0,),
+         SizedBox(height: 20.0),
 
-          ElevatedButton(onPressed: () {}, child: Text('Submit'))
+          ElevatedButton(
+            onPressed: () {},
+            style: ButtonStyle(
+              backgroundColor: MaterialStateProperty.all<Color>(Colors.blue), // Background color
+            ),
+            child: const Text('Submit'),
+            )
         ],),
     );
+  }
+
+  void submitData() {
+    //get the data from the form
+    //submit data
   }
 }
