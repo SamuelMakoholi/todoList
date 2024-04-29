@@ -71,10 +71,45 @@ class _AddTodoPageState extends State<AddTodoPage> {
     //Submit data to the surver
     final url = 'https://api.nstack.in/v1/todos';
     final uri = Uri.parse(url);
-    final response = await http.post(uri, body: jsonEncode(body));
+    final response = await http.post(
+      uri, 
+      body: jsonEncode(body),
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      );
+
+       void showSuccessMessage(String message) {
+
+          final snackBar = SnackBar(content: Text(message));
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
+        }
+
+  void showErrorMessage(String message) {
+    final snackBar = SnackBar(
+      content: Text(
+        message,
+        style: TextStyle(
+          color: Colors.white,
+          backgroundColor: Colors.red,
+        ),
+      ),
+    );
+
+  ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
+}
 
     //show the succes or fail message on status
-    print(response);
+    if(response.statusCode ==201) {
+      titleController.text = '';
+      descriptionController.text = '';
+      showSuccessMessage('Creation Success');
+
+    }else {
+     showErrorMessage('Creation Failed');
+    }
 
   }
 }
