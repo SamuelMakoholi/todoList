@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:todo_app/screens/add_page.dart';
 import 'package:http/http.dart' as http;
+import 'package:todo_app/services/todo_service.dart';
 
 class TodoListPage extends StatefulWidget {
   const TodoListPage({Key? key}) : super(key: key);
@@ -24,10 +25,8 @@ class _TodoListPageState extends State<TodoListPage> {
 
   Future<void> deleteById(String id) async {
     //delete item by Id
-    final url = 'https://api.nstack.in/v1/todos/$id';
-    final uri = Uri.parse(url);
-    final response = await http.delete(uri);
-    if(response.statusCode == 200){
+   final isSuccess = await TodoService.deleteById(id);
+    if(isSuccess == 200){
       //remove from the list
       final filtered = items.where((element) => element['_id'] != id).toList();
 
@@ -91,42 +90,57 @@ class _TodoListPageState extends State<TodoListPage> {
       child: Center(
         child: CircularProgressIndicator(),
       ),
-      replacement: ListView.builder(
-        itemCount: items.length,
-        itemBuilder: (context, index) {
-          final item = items[index] as Map;
-          final id = item['_id'] as String;
+      replacement: RefreshIndicator(
+        onRefresh: fetchTodo,
+        child: Visibility(
+          visible: items.isNotEmpty,
+          replacement: Center(
+            child: Text(
+              'No Todo Items',
+              style: Theme.of(context).textTheme.headlineSmall,
+              )),
+        child: ListView.builder(
 
-          return ListTile(
-            leading: CircleAvatar(child: Text('${index + 1}')),
-            title: Text(item['title']),
-            subtitle: Text(item['description']),
-            trailing: PopupMenuButton(
-              onSelected: (value) => {
-                if(value == 'edit'){
-                  //open edit page
-                  navigateToEditPage(item)
-
-                } else if (value == 'delete') {
-                  //delete and refresh page
-                  deleteById(id)
-                }
-              },
-              itemBuilder: (context) {
-                return [
-                  PopupMenuItem(
-                    child: Text('Edit'),
-                    value: 'edit',
-                  ),
-                  PopupMenuItem(
-                    child: Text('Delete'),
-                    value: 'delete',),
-                ];
-
-            }),
-          );
-        },
+          itemCount: items.length,
+          padding: EdgeInsets.all(8),
+          itemBuilder: (context, index) {
+            final item = items[index] as Map;
+            final id = item['_id'] as String;
+        
+            return Card(
+              child: ListTile(
+                leading: CircleAvatar(child: Text('${index + 1}')),
+                title: Text(item['title']),
+                subtitle: Text(item['description']),
+                trailing: PopupMenuButton(
+                  onSelected: (value) => {
+                    if(value == 'edit'){
+                      //open edit page
+                      navigateToEditPage(item)
+                      
+                    } else if (value == 'delete') {
+                      //delete and refresh page
+                      deleteById(id)
+                    }
+                  },
+                  itemBuilder: (context) {
+                    return [
+                      PopupMenuItem(
+                        child: Text('Edit'),
+                        value: 'edit',
+                      ),
+                      PopupMenuItem(
+                        child: Text('Delete'),
+                        value: 'delete',),
+                    ];
+                      
+                }),
+              ),
+            );
+          },
+        ),
       ),
+      )
     ),
   ),
      
